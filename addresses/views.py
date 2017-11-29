@@ -40,7 +40,7 @@ def checkout_address_reuse_view(request):
             shipping_address = request.POST.get('shipping_address', None)
             address_type = request.POST.get('address_type', None)
             billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
-            
+
             if shipping_address is not None:
                 qs = Address.objects.filter(billing_profile=billing_profile, id=shipping_address)
                 if qs.exists():
