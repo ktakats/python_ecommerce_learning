@@ -19,8 +19,7 @@
     </div>
 
     {% else %}
-
-        {% if not obj.shipping_address %}
+        {% if not object.shipping_address %}
             <div class="row">
                 <div class="col-md-6 mx-auto col-10">
                     <p class="lead">Shipping Address</p>
@@ -30,7 +29,7 @@
                 </div>
             </div>
 
-        {% elif not obj.billing_address %}
+        {% elif not object.billing_address %}
 
            <div class="row">
                 <div class="col-md-6 mx-auto col-10">
