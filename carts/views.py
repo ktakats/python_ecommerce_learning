@@ -6,6 +6,7 @@ from .models import Cart
 from accounts.forms import LoginForm, GuestForm
 from accounts.models import GuestEmail
 from billing.models import BillingProfile
+from addresses.forms import AddressForm
 
 
 # Create your views here.
@@ -36,9 +37,11 @@ def checkout_home(request):
     order_obj = None
     if cart_created or cart_obj.products.count()==0:
         return redirect("cart:home")
-    
+
     login_form = LoginForm()
     guest_form = GuestForm()
+    address_form = AddressForm()
+    billing_address_form = AddressForm()
 
     billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
 
@@ -48,5 +51,6 @@ def checkout_home(request):
     context ={"object": order_obj,
               "billing_profile": billing_profile,
               "login_form": login_form,
-              "guest_form": guest_form}
+              "guest_form": guest_form,
+              "address_form": address_form}
     return render(request, "carts/checkout.html", context)

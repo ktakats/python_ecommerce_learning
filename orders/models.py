@@ -19,7 +19,7 @@ class OrderManager(models.Manager):
         qs = self.get_queryset().filter(billing_profile=billing_profile, cart=cart_obj, active=True)
         created = False
         if qs.count() == 1:
-            obj = order_qs.first()
+            obj = qs.first()
         else:
             obj = self.model.objects.create(billing_profile=billing_profile, cart=cart_obj)
             created = True
