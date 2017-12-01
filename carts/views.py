@@ -13,6 +13,10 @@ from addresses.models import Address
 
 # Create your views here.
 
+def cart_detail_api_view(request):
+    cart_obj, new_obj = Cart.objects.new_or_get(request)
+    products = [{"name": x.title, "price": x.price, "url": x.get_absolute_url(), "id": x.id} for x in cart_obj.products.all()]
+    return JsonResponse({"products": products, "subtotal": cart_obj.subtotal, "total": cart_obj.total})
 
 def cart_home(request):
     cart_obj, new_obj=Cart.objects.new_or_get(request)
