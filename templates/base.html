@@ -33,6 +33,64 @@
 
       <script>
           $(document).ready(function(){
+            //Contact for handler
+            var contactForm = $(".contact-form");
+            var contactFormMethod = contactForm.attr("method");
+            var contactFormEndpoint = contactForm.attr("action");
+            var contactFormSubmitBtn = contactForm.find("[type='submit']");
+            var contactFormSubmitBtnTxt=contactFormSubmitBtn.text();
+
+            function displaySubmitting(doSubmit){
+                if(doSubmit){
+                    contactFormSubmitBtn.addClass("disabled");
+                    contactFormSubmitBtn.html("<i class='fa fa-spin fa-spinner'></i>Sending...");
+                }
+                else{
+                    contactFormSubmitBtn.removeClass("disabled");
+                    contactFormSubmitBtn.html(contactFormSubmitBtnTxt);
+                }
+            }
+
+            contactForm.submit(function(event){
+                event.preventDefault();
+                var contactFormData = contactForm.serialize();
+                var thisForm = $(this);
+                displaySubmitting(true);
+                $.ajax({
+                    url: contactFormEndpoint,
+                    method: contactFormMethod,
+                    data: contactFormData,
+                    success: function(data){
+                        thisForm[0].reset();
+                        setTimeout(function(){
+                            $.alert({
+                                title: "Success!",
+                                content: data.message,
+                                theme: "modern",
+                            });
+                            displaySubmitting(false);
+                         }, 2000);
+                    },
+                    error: function(errorData){
+                        console.log(errorData)
+                        var jsonData=errorData.responseJSON;
+                        var msg ="";
+
+                        $.each(jsonData, function(key, value){
+                            msg += key + ": " + value[0].message + "\n";
+                        })
+
+                        $.alert({
+                            title: "Oops",
+                            content: msg,
+                            theme: "modern",
+                        });
+                        displaySubmitting(false);
+                    }
+                })
+            })
+
+
             //Auto Search
             var searchForm = $(".search-form");
             var searchInput = searchForm.find("[name='q']");
@@ -95,7 +153,7 @@
                         $.alert({
                         title: "Oops",
                         content: "An error occurred",
-                        theme: "modern});
+                        theme: "modern"});
                     }
                 })
             })
@@ -138,7 +196,7 @@
                         $.alert({
                         title: "Oops",
                         content: "An error occurred",
-                        theme: "modern});
+                        theme: "modern"});
                     }
                 })
             }
