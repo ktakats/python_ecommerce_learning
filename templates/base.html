@@ -27,9 +27,43 @@
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+        <!--Jquery-confirm-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
 
       <script>
           $(document).ready(function(){
+            //Auto Search
+            var searchForm = $(".search-form");
+            var searchInput = searchForm.find("[name='q']");
+            var typingTimer;
+            var typingInterval = 1000 //.5 sec
+            var searchBtn = searchForm.find("[type='submit']");
+
+            searchInput.keyup(function(event){
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(performSearch, typingInterval);
+            });
+
+            searchInput.keydown(function(event){
+                clearTimeout(typingTimer);
+            });
+
+            function displaySearch(){
+                searchBtn.addClass("disabled");
+                searchBtn.html("<i class='fa fa-spin fa-spinner'></i> Searching...");
+            }
+
+            function performSearch(){
+                displaySearch();
+                var query = searchInput.val();
+                setTimeout(function(){
+                    window.location.href='/search/\?q=' + query;
+                }, 1000)
+            }
+
+
+          //Cart and Add products
             var productForm = $('.form-product-ajax');
             productForm.submit(function(event){
                 event.preventDefault();
@@ -58,7 +92,10 @@
                         }
                     },
                     error: function(errorData){
-                        console.log(errorData);
+                        $.alert({
+                        title: "Oops",
+                        content: "An error occurred",
+                        theme: "modern});
                     }
                 })
             })
@@ -98,7 +135,10 @@
                         }
                     },
                     error: function(errorData){
-                        console.log(errorData)
+                        $.alert({
+                        title: "Oops",
+                        content: "An error occurred",
+                        theme: "modern});
                     }
                 })
             }
