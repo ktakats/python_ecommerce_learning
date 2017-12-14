@@ -1,4 +1,7 @@
 *pyc
 db.sqlite3
+db2.sqlite3
 */migrations
 .gitignore
+.idea
+products/fixtures
