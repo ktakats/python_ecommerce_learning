@@ -5,3 +5,4 @@ db2.sqlite3
 .gitignore
 .idea
 products/fixtures
+.env
