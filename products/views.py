@@ -2,6 +2,7 @@ from django.views.generic import ListView, DetailView
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from .models import Product
+from analytics.mixins import ObjectViewedMixin
 from carts.models import Cart
 # Create your views here.
 
@@ -30,7 +31,7 @@ class ProductFeaturedListView(ListView):
         request=self.request
         return Product.objects.featured()
 
-class ProductDetailSlugView(DetailView):
+class ProductDetailSlugView(ObjectViewedMixin, DetailView):
     queryset = Product.objects.all()
     template_name = "products/detail.html"
 
@@ -53,9 +54,10 @@ class ProductDetailSlugView(DetailView):
             instance=qs.first()
         except:
             raise Http404("Hmmm.")
+        #object_viewed_signal.send(instance.__class__, instance=instance, request=request)
         return instance
 
-class ProductDetailView(DetailView):
+class ProductDetailView(ObjectViewedMixin, DetailView):
     #queryset = Product.objects.all()
     template_name = "products/detail.html"
 
@@ -84,7 +86,7 @@ def product_detail_view(request, pk):
     }
     return render(request, "products/detail.html", context)
 
-class ProductFeaturedDetailView(DetailView):
+class ProductFeaturedDetailView(ObjectViewedMixin, DetailView):
     template_name = "products/featured-detail.html"
 
     def get_queryset(self, *args, **kwargs):
