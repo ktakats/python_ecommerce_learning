@@ -39,9 +39,9 @@ urlpatterns = [
     url(r'^products/', include("products.urls", namespace="products")),
     url(r'^search/', include("search.urls", namespace="search")),
     url(r'^cart/', include("carts.urls", namespace="cart")),
-    url(r'^api/cart/', cart_detail_api_view, name="api-cart"),
-    url(r'^billing/payment-method/', payment_method_view, name="billing-payment-method"),
-    url(r'^billing/payment-method/create/', payment_method_createview, name="billing-payment-method-endpoint"),
+    url(r'^api/cart/$', cart_detail_api_view, name="api-cart"),
+    url(r'^billing/payment-method/$', payment_method_view, name="billing-payment-method"),
+    url(r'^billing/payment-method/create/$', payment_method_createview, name="billing-payment-method-endpoint"),
 ]
 
 if settings.DEBUG:
