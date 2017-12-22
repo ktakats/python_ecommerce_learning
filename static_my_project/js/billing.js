@@ -67,21 +67,53 @@ $(document).ready(function(){
     });
 
     // Handle form submission
-    var form = document.getElementById('payment-form');
-    form.addEventListener('submit', function(event) {
+    var form =$('#payment-form');
+    var btnLoad = form.find('.btn-load');
+    var btnLoadDefaultHtml = btnLoad.html();
+    var btnLoadDefaultClasses = btnLoad.attr('class');
+
+    form.on('submit', function(event) {
       event.preventDefault();
+
+      var $this=$(this);
+
+      btnLoad.blur();
+
+      var loadTime = 1500;
+      var currentTimeout;
+      var errorHtml = "<i class='fa fa-warning'></i> An error occured";
+      var errorClasses ="btn btn-danger disabled my-3";
+      var loadingHtml = "<i class='fa fa-spin fa-snipper'></i> Loading...";
+      var loadingClasses = "btn btn-success disabled my-3";
 
       stripe.createToken(card).then(function(result) {
         if (result.error) {
           // Inform the user if there was an error
-          var errorElement = document.getElementById('card-errors');
+          var errorElement = $('#card-errors');
           errorElement.textContent = result.error.message;
+          currentTimeout = displayBtnStatus(btnLoad, errorHtml, errorClasses, 1000, currentTimeout);
         } else {
           // Send the token to your server
+          currentTimeout = displayBtnStatus(btnLoad, loadingHtml, loadingClasses, 2000, currentTimeout);
           stripeTokenHandler(nextUrl, result.token);
         }
       });
     });
+
+    function displayBtnStatus(element, newHtml, newClasses, loadTime, timeout){
+        if (!loadTime){
+            loadTime = 1500;
+        }
+
+        element.html(newHtml);
+        element.removeClass(btnLoadDefaultClasses);
+        element.addClass(newClasses);
+        return setTimeout(function(){
+            element.html(btnLoadDefaultHtml);
+            element.removeClass(newClasses);
+            element.addClass(btnLoadDefaultClasses);
+        }, loadTime);
+    }
 
     function redirectToNext(nextPath){
         if (nextPath){
@@ -109,6 +141,8 @@ $(document).ready(function(){
                 else {
                     alert(successMsg);
                 }
+                btnLoad.html(btnLoadDefaultHtml);
+                btnLoad.attr('class', btnLoadDefaultClasses);
                 redirectToNext(nextUrl);
             },
             error: function(error){}

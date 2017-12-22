@@ -85,6 +85,8 @@ def checkout_home(request):
                 order_obj.mark_paid()
                 del request.session['cart_id']
                 request.session['cart_items'] = 0
+                if not billing_profile.user:
+                    billing_profile.set_cards_inactive()
             else:
                 print(crg_msg)
             return redirect("cart:success")
