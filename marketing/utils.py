@@ -21,7 +21,6 @@ def get_subscriber_hash(member_email):
     return m.hexdigest()
 
 
-
 class Mailchimp(object):
     def __init__(self):
         super(Mailchimp, self).__init__()
@@ -38,14 +37,15 @@ class Mailchimp(object):
         hashed_email = get_subscriber_hash(email)
         endpoint = self.get_members_endpoint() + "/" + hashed_email
         r=requests.get(endpoint, auth=("", self.key))
-        return r.json()
+        return r.status_code, r.json()
 
     def change_subscription_status(self, email, status='unsubscribed'):
         hashed_email = get_subscriber_hash(email)
         endpoint = self.get_members_endpoint() + "/" + hashed_email
+        print(endpoint)
         data = {"status": self.check_valid_status(status)}
         r=requests.put(endpoint, auth=("", self.key), data=json.dumps(data))
-        return r.json()
+        return r.status_code, r.json()
 
     def check_valid_status(self, status):
         choices = ['subscribed', 'unsubscribed', 'cleaned', 'pending']
@@ -62,7 +62,7 @@ class Mailchimp(object):
         # return r.json()
         return self.subscribe(email)
 
-    def unsubscibe(self, email):
+    def unsubscribe(self, email):
         return self.change_subscription_status(email, status='unsubscribed')
 
     def subscribe(self, email):
