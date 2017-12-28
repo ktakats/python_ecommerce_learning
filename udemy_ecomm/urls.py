@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 from .views import home_page, about_page, contact_page
 from accounts.views import LoginView, RegisterView, guest_register_view
@@ -40,6 +41,9 @@ urlpatterns = [
     url(r'^products/', include("products.urls", namespace="products")),
     url(r'^search/', include("search.urls", namespace="search")),
     url(r'^cart/', include("carts.urls", namespace="cart")),
+    url(r'^account/', include("accounts.urls", namespace="account")),
+    url(r'^accounts/$', RedirectView.as_view(url='/account')),
+    url(r'^settings/$', RedirectView.as_view(url='/account')),
     url(r'^api/cart/$', cart_detail_api_view, name="api-cart"),
     url(r'^billing/payment-method/$', payment_method_view, name="billing-payment-method"),
     url(r'^billing/payment-method/create/$', payment_method_createview, name="billing-payment-method-endpoint"),
