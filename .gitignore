@@ -6,3 +6,4 @@ db2.sqlite3
 .idea
 products/fixtures
 .env
+udemy_ecomm/settings/local.py
