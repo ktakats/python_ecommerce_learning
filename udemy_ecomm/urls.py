@@ -42,7 +42,7 @@ urlpatterns = [
     url(r'^search/', include("search.urls", namespace="search")),
     url(r'^cart/', include("carts.urls", namespace="cart")),
     url(r'^account/', include("accounts.urls", namespace="account")),
-    url(r'^accounts/$', include("accounts.passwords.urls")),
+    url(r'^accounts/', include("accounts.passwords.urls")),
     url(r'^settings/$', RedirectView.as_view(url='/account')),
     url(r'^api/cart/$', cart_detail_api_view, name="api-cart"),
     url(r'^billing/payment-method/$', payment_method_view, name="billing-payment-method"),
