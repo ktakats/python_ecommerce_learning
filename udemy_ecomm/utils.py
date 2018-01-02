@@ -16,7 +16,15 @@ def unique_order_id_generator(instance):
         unique_order_id_generator(instance)
     return order_new_id
 
+def unique_key_generator(instance):
+    size = random.randint(30, 45)
+    key = random_string_generator(size=size)
 
+    klass = instance.__class__
+    qs_exists = klass.objects.filter(key=key).exists()
+    if qs_exists:
+        unique_key_generator(instance)
+    return key
 
 def unique_slug_generator(instance, new_slug=None):
 
