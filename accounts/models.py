@@ -1,13 +1,16 @@
+from datetime import timedelta
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.template.loader import get_template
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.utils import timezone
 
 from udemy_ecomm.utils import unique_key_generator
 
-# Create your models here.
+DEFAULT_ACTIVATION_DAYS = getattr(settings, 'DEFAULT_ACTIVATION_DAYS', 7)
 
 class UserManager(BaseUserManager):
     def create_user(self, email, full_name=None, password=None, is_active=True, is_staff=False, is_admin=False):
@@ -75,18 +78,50 @@ class User(AbstractBaseUser):
     # def is_active(self):
     #     return self.active
 
+class EmailActivationQuerySet(models.query.QuerySet):
+    def confirmable(self):
+        now = timezone.now()
+        start_range = now - timedelta(days=DEFAULT_ACTIVATION_DAYS)
+        end_range = now
+        return self.filter(activated=False, forced_expired=False).filter(timestamp__gt=start_range, timestamp__lte=end_range)
+
+class EmailActivationManager(models.Manager):
+    def get_queryset(self):
+        return EmailActivationQuerySet(self.model, using=self._db)
+
+    def confirmable(self):
+        return self.get_queryset().confirmable()
+
 class EmailActivation(models.Model):
     user = models.ForeignKey(User)
     email = models.EmailField()
     key = models.CharField(max_length=120, blank=True, null=True)
     activated = models.BooleanField(default=False)
     forced_expired = models.BooleanField(default=False)
-    expires = models.IntegerField(default=7) # 7 days
+    expires = models.IntegerField(default=DEFAULT_ACTIVATION_DAYS) # 7 days
     timestamp = models.DateTimeField(auto_now_add=True)
     update = models.DateTimeField(auto_now_add=True)
 
+    objects=EmailActivationManager()
+
     def __str__(self):
         return self.email
+
+    def can_activate(self):
+        qs = EmailActivation.objects.filter(pk=self.pk).confirmable()
+        if qs.exists():
+            return True
+        return False
+
+    def activate(self):
+        if self.can_activate():
+            user = self.user
+            user.is_active = True
+            user.save()
+            self.activated = True
+            self.save()
+            return True
+        return False
 
     def regenerate(self):
         self.key = None
@@ -99,7 +134,7 @@ class EmailActivation(models.Model):
         if not self.activated and not self.forced_expired:
             if self.key:
                 base_url=getattr(settings, 'BASE_URL')
-                key_path = self.key
+                key_path = reverse("account:email-activate", kwargs={'key': self.key})
                 path = "{base}{path}".format(base=base_url, path=key_path)
                 context = {'path': path, 'email': self.email}
                 txt_ = get_template("registration/emails/verify.txt").render(context)
