@@ -3,9 +3,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 from .models import EmailActivation
-
+from .signals import user_logged_in
 User = get_user_model()
 
 class ReactivateEmailForm(forms.Form):
@@ -59,6 +61,29 @@ class LoginForm(forms.Form):
 
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput())
+
+    def __init__(self, request, *args, **kwargs):
+        self.request = request
+        super(LoginForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        request = self.request
+        data = self.cleaned_data
+        email = data.get("email")
+        password = data.get("password")
+        user = authenticate(request, username=email, password=password)
+        if user is None:
+            raise forms.ValidationError("Invalid credentials")
+        login(request, user)
+        self.user = user
+        user_logged_in.send(user.__class__, instance=user, request=request)
+        try:
+            del request.session['guest_email_id']
+        except:
+            pass
+        return data
+
+
 
 
 class RegisterForm(forms.ModelForm):
