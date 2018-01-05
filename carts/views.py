@@ -54,8 +54,8 @@ def checkout_home(request):
     if cart_created or cart_obj.products.count()==0:
         return redirect("cart:home")
 
-    login_form = LoginForm()
-    guest_form = GuestForm()
+    login_form = LoginForm(request)
+    guest_form = GuestForm(request)
     address_form = AddressForm()
     billing_address_id = request.session.get('billing_address_id', None)
     shipping_address_id = request.session.get('shipping_address_id', None)
@@ -88,7 +88,7 @@ def checkout_home(request):
                 if not billing_profile.user:
                     billing_profile.set_cards_inactive()
             else:
-                print(crg_msg)
+                pass
             return redirect("cart:success")
 
 
