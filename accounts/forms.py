@@ -44,6 +44,13 @@ class UserAdminCreationForm(forms.ModelForm):
             user.save()
         return user
 
+class UserDetailChangeForm(forms.ModelForm):
+    full_name = forms.CharField(label="Name", required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    class Meta:
+        model = User
+        fields = ['full_name']
+
 class UserAdminChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
 
