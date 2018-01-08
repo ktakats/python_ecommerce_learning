@@ -26,6 +26,7 @@ from addresses.views import checkout_address_create_view, checkout_address_reuse
 from billing.views import payment_method_view, payment_method_createview
 from carts.views import cart_detail_api_view
 from marketing.views import MarketingPreferenceUpdateView, MailchimpWebhookView
+from orders.views import LibraryView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -38,6 +39,7 @@ urlpatterns = [
     url(r'^register/guest/$', GuestRegisterView.as_view(), name='guest_register'),
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
     url(r'^register/$', RegisterView.as_view(), name='register'),
+    url(r'^library/$', LibraryView.as_view(), name='library'),
     url(r'^products/', include("products.urls", namespace="products")),
     url(r'^search/', include("search.urls", namespace="search")),
     url(r'^cart/', include("carts.urls", namespace="cart")),
