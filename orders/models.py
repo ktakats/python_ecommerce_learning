@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import pre_save, post_save
@@ -6,6 +7,7 @@ from carts.models import Cart
 from billing.models import BillingProfile
 from udemy_ecomm.utils import unique_order_id_generator
 from addresses.models import Address
+from products.models import Product
 
 # Create your models here.
 
@@ -89,10 +91,21 @@ class Order(models.Model):
             return True
         return False
 
+    def update_purchases(self):
+        for p in self.cart.products.all():
+            obj, created = ProductPurchase.objects.get_or_create(
+                order_id=self.order_id,
+                product=p,
+                billing_profile=self.billing_profile
+            )
+        return ProductPurchase.objects.filter(order_id=self.order_id).count()
+
     def mark_paid(self):
-        if self.check_done():
-            self.status = "paid"
-            self.save()
+        if self.status != 'paid':
+            if self.check_done():
+                self.status = "paid"
+                self.save()
+                self.update_purchases()
         return self.status
 
 
@@ -121,3 +134,19 @@ def post_save_order(sender, instance, created, *args, **kwargs):
         instance.update_total()
 
 post_save.connect(post_save_order, sender=Order)
+
+class ProductPurchaseManager(models.Manager):
+    def all(self):
+        return self.get_queryset().filter(refunded=False)
+
+class ProductPurchase(models.Model):
+    billing_profile = models.ForeignKey(BillingProfile)
+    order_id = models.CharField(max_length=120)
+    product = models.ForeignKey(Product)
+    refunded = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    objects = ProductPurchaseManager()
+
+    def __str__(self):
+        return self.product.title
