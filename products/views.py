@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
 from django.shortcuts import render, get_object_or_404, redirect
@@ -113,6 +114,7 @@ from wsgiref.util import FileWrapper
 from django.conf import settings
 import os
 from mimetypes import guess_type
+from orders.models import ProductPurchase
 
 class ProductDownloadView(View):
     def get(self, *args, **kwargs):
@@ -122,6 +124,25 @@ class ProductDownloadView(View):
         if downloads_qs.count() != 1:
             raise Http404("Download not found")
         download_obj = downloads_qs.first()
+
+        can_download = False
+        user_ready = True
+        if download_obj.user_required:
+            if self.request.user.is_authenticated():
+                user_ready = True
+
+        purchased_products = Product.objects.none()
+        if download_obj.free:
+            can_download = True
+        else:
+            purchased_products = ProductPurchase.objects.products_by_request(self.request)
+            if download_obj.product in purchased_products:
+                can_download = True
+
+        if not can_download or not user_ready:
+            messages.error(self.request, "You do not access to download this item.")
+            return redirect(download_obj.get_default_url())
+
         file_root = settings.PROTECTED_ROOT
         filepath = download_obj.file.path
         final_filepath = os.path.join(file_root, filepath)
