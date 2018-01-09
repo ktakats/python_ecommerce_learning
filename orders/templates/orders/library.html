@@ -10,14 +10,17 @@
 <div class="row">
     <div class="col-12 col-md-6 mx-auto">
         <table class="table">
-            <thead><th>Product</th><th>Order</th><th>Download</th></thead>
+            <thead><th>Product</th><th>Download</th></thead>
 
             <tbody>
                 {% for object in object_list %}
                     <tr>
-                        <td><a href="{{object.product.get_absolute_url}}">{{ object.product.title }}</a></td>
-                        <td><a href="#">Order #{{object.order_id}}</a></td>
+                        <td><a href="{{object.get_absolute_url}}">{{ object.title }}</a></td>
                         <td>Coming soon</td>
+                        <td>{% for download in object.get_downloads%}
+                            <a href="{{ download.get_download_url }}">{{ download.name}}</a>
+                            {% endfor %}
+                        </td>
 
                     </tr>
                 {% empty %}
