@@ -91,13 +91,22 @@ pre_save.connect(product_pre_save_receiver, sender=Product)
 
 def upload_product_file_loc(instance, filename):
     slug = instance.product.slug
+    id_ = 0
+    if instance.id is not None:
+        id_ = instance.id
+    else:
+        Klass = instance.__class__
+        qs = Klass.objects.all().order_by('-pk')
+        id_ = qs.first().id + 1
+
     if not slug:
         slug = unique_slug_generator(instance.product)
-    location = "product/{}/".format(slug)
+    location = "product/{slug}/{id}".format(slug=slug, id=id_)
     return location + filename
 
 class ProductFile(models.Model):
     product = models.ForeignKey(Product)
+    name = models.CharField(max_length=120, null=True, blank=True)
     file = models.FileField(
         upload_to=upload_product_file_loc,
         storage=FileSystemStorage(location=settings.PROTECTED_ROOT)
@@ -115,5 +124,9 @@ class ProductFile(models.Model):
         return reverse("products:download", kwargs={"slug": self.product.slug, "pk": self.pk})
 
     @property
-    def name(self):
-        return get_filename(self.file.url)
+    def display_name(self):
+        og_name = get_filename(self.file.url)
+        if self.name:
+            return self.name
+        return og_name
+
