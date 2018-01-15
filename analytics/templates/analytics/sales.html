@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <h1>Sales Data</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h1>Today sales</h1>
+    </div>
+    <div class="col">
+        <p>Recent Total: {{today.recent_data.total__sum}}</p>
+        <ol>
+            {% for order in today.recent%}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+     <div class="col">
+        <p>Shipped Total: {{today.shipped_data.total__sum}}</p>
+        <ol>
+            {% for order in today.shipped%}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+     <div class="col">
+        <p>Paid Total: {{today.paid_data.total__sum}}</p>
+        <ol>
+            {% for order in today.paid%}
+            <li>{{ order.order_id }}
+           {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h1>This week sales</h1>
+    </div>
+    <div class="col">
+        <p>Recent Total: {{this_week.recent_data.total__sum}}</p>
+        <ol>
+            {% for order in this_week.recent%}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+     <div class="col">
+        <p>Shipped Total: {{this_week.shipped_data.total__sum}}</p>
+        <ol>
+            {% for order in this_week.shipped%}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+     <div class="col">
+        <p>Paid Total: {{this_week.paid_data.total__sum}}</p>
+        <ol>
+            {% for order in this_week.paid%}
+            <li>{{ order.order_id }}
+           {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h1>Previous four weeks sales</h1>
+    </div>
+    <div class="col">
+        <p>Recent Total: {{last_four_weeks.recent_data.total__sum}}</p>
+        <ol>
+            {% for order in last_four_weeks.recent%}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+     <div class="col">
+        <p>Shipped Total: {{last_four_weeks.shipped_data.total__sum}}</p>
+        <ol>
+            {% for order in last_four_weeks.shipped%}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+     <div class="col">
+        <p>Paid Total: {{last_four_weeks.paid_data.total__sum}}</p>
+        <ol>
+            {% for order in last_four_weeks.paid%}
+            <li>{{ order.order_id }}
+           {{ order.total }}
+            {{ order.updated }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+
+{% endblock %}
