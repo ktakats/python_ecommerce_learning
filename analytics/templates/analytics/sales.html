@@ -1,70 +1,8 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block javascript %}
-<script>
 
-$(document).ready(function(){
-
-    function renderChart(id, data, labels){
-        var ctx = $('#'+id);
-        var myChart = new Chart(ctx, {
-            type: 'line',
-             data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Sales',
-                    data: data,
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)'
-                    ],
-                     borderWidth: 1
-                 }]
-             },
-             options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                },
-             }
-        });
-    }
-
-    function getSalesData(id, type){
-
-        var url = '/analytics/sales/data/';
-        var method = 'GET';
-        var data = {"type": type};
-
-        $.ajax({
-            url: url,
-            method: method,
-            data: data,
-            success: function(data){
-                renderChart(id, data.data, data.labels)
-            },
-            error: function(error){
-                $.alert("An error occurred")
-            }
-        })
-    }
-
-    var chartsToRender = $('.my-render-chart');
-    $.each(chartsToRender, function(index, html){
-        var $this = $(this);
-        if( $this.attr('id') && $this.attr('data-type') ){
-            getSalesData($this.attr('id'), $this.attr('data-type'));
-        }
-    })
-});
-
-
-</script>
+<script src="{% static 'js/sales.js' %}"></script>
 
 {% endblock%}
 
@@ -75,7 +13,7 @@ $(document).ready(function(){
         <h1>Sales Data</h1>
     </div>
 </div>
-
+<hr/>
 <div class="row my-4">
     <div class="col-4">
         <h3>Today sales</h3>
@@ -83,9 +21,9 @@ $(document).ready(function(){
         <p>Recent Total: {{today.recent_data.total__sum}}</p>
         <ol>
             {% for order in today.recent%}
-            <li>{{ order.order_id }}
-            {{ order.total }}
-            {{ order.updated }}</li>
+            <li class="my-3">Order #{{ order.order_id }}<br/>
+            Total: ${{ order.total }}<br/>
+            {{ order.updated|timesince }} ago</li>
             {% endfor %}
         </ol>
 
@@ -94,9 +32,9 @@ $(document).ready(function(){
         <p>Recent Total: {{this_week.recent_data.total__sum}}</p>
         <ol>
             {% for order in this_week.recent%}
-            <li>{{ order.order_id }}
-            {{ order.total }}
-            {{ order.updated }}</li>
+            <li class="my-3">Order #{{ order.order_id }}<br/>
+            Total: ${{ order.total }}<br/>
+            {{ order.updated|timesince }} ago</li>
             {% endfor %}
         </ol>
     </div>
@@ -116,9 +54,9 @@ $(document).ready(function(){
         <p>Recent Total: {{last_four_weeks.recent_data.total__sum}}</p>
         <ol>
             {% for order in last_four_weeks.recent%}
-            <li>{{ order.order_id }}
-            {{ order.total }}
-            {{ order.updated }}</li>
+            <li>Order #{{ order.order_id }}<br/>
+            Total: ${{ order.total }}<br/>
+            {{ order.updated|timesince }} ago</li>
             {% endfor %}
         </ol>
     </div>
